@@ -67,12 +67,12 @@ generate_cert_with_keystore_and_truststore() {
   openssl genpkey \
     -algorithm EC \
     -pkeyopt ec_paramgen_curve:secp521r1 \
-    -out "$cert_dir/key.pem"
+    -out "$cert_dir/$alias_name.key.pem"
 
   openssl genpkey \
     -algorithm EC \
     -pkeyopt ec_paramgen_curve:secp521r1 \
-    -out "$cert_dir/server.key"
+    -out "$cert_dir/$alias_name.key"
 
   # === Create OpenSSL config ===
   echo "Creating OpenSSL config with SANs..."
@@ -117,37 +117,37 @@ EOF
   # === Generate CSR ===
   echo "Generating certificate signing request (CSR)..."
   openssl req -new \
-    -key "$cert_dir/key.pem" \
-    -out "$cert_dir/csr.pem" \
+    -key "$cert_dir/$alias_name.key.pem" \
+    -out "$cert_dir/$alias_name.csr.pem" \
     -config "$cert_dir/$alias_name.openssl.cnf"
 
   openssl req -new \
-    -key "$cert_dir/server.key" \
-    -out "$cert_dir/server.csr" \
+    -key "$cert_dir/$alias_name.key" \
+    -out "$cert_dir/$alias_name.csr" \
     -config "$cert_dir/$alias_name.openssl.cnf"
 
   # === Sign cert with CA ===
   echo "Signing certificate with CA..."
   openssl x509 -req \
-    -in "$cert_dir/csr.pem" \
+    -in "$cert_dir/$alias_name.csr.pem" \
     -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial \
-    -out "$cert_dir/cert.pem" -days 365 -sha512 \
+    -out "$cert_dir/$alias_name.cert.pem" -days 365 -sha512 \
     -extfile "$cert_dir/$alias_name.openssl.cnf" -extensions req_ext
 
   openssl x509 -req \
-    -in "$cert_dir/server.csr" \
+    -in "$cert_dir/$alias_name.csr" \
     -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial \
-    -out "$cert_dir/server.crt" -days 365 -sha512 \
+    -out "$cert_dir/$alias_name.crt" -days 365 -sha512 \
     -extfile "$cert_dir/$alias_name.openssl.cnf" -extensions req_ext
 
   # === Create PKCS#12 keystore ===
   echo "Creating PKCS#12 keystore..."
   openssl pkcs12 -export \
-    -inkey "$cert_dir/key.pem" \
-    -in "$cert_dir/cert.pem" \
+    -inkey "$cert_dir/$alias_name.key.pem" \
+    -in "$cert_dir/$alias_name.cert.pem" \
     -certfile "$ca_cert" \
     -passout pass:"$cert_secret" \
-    -out "$cert_dir/keystore.p12" \
+    -out "$cert_dir/$alias_name.keystore.p12" \
     -name "$alias_name"
 
   # === Create PKCS#12 truststore ===
@@ -157,7 +157,7 @@ EOF
     -trustcacerts \
     -alias "$CA_NAME" \
     -file "$ca_cert" \
-    -keystore "$cert_dir/truststore.p12" \
+    -keystore "$cert_dir/$alias_name.truststore.p12" \
     -storetype PKCS12 \
     -storepass "$cert_secret"
 

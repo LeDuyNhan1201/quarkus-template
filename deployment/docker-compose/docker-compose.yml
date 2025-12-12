@@ -1,35 +1,43 @@
 services:
   # --------- Postgres ---------
   postgres:
-    build:
-      args:
-        POSTGRES_TAG: ${POSTGRES_TAG:-latest}
-      context: ./postgres
+#    build:
+#      args:
+#        POSTGRES_TAG: ${POSTGRES_TAG:-latest}
+#      context: ../postgresql
+    image: postgres:${POSTGRES_TAG:-latest}
     container_name: postgres
     ports:
       - "5432:5432"
     networks:
       - my-network
     command: >
-      postgres 
-      -c 'max_connections=500'
-      -c ssl=on
-      -c ssl_cert_file=/var/lib/postgresql/18/main/server.crt
-      -c ssl_key_file=/var/lib/postgresql/18/main/server.key
-      -c ssl_ca_file=/var/lib/postgresql/18/main/ca.crt
+      postgres
+      -c max_connections=500
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c hba_file=/etc/postgresql/pg_hba.conf
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 30s
       timeout: 10s
-      start_period: 30s
       retries: 3
-    restart: always # unless-stopped
+      start_period: 30s
+    restart: always
     volumes:
-      - ./postgres/init-db:/docker-entrypoint-initdb.d:ro
-      - postgres-data:/var/lib/postgresql/data
+      - ../secrets/certs/ca/ca.crt:/etc/postgresql/root.crt:ro
+      - ../secrets/certs/postgresql/postgresql.key:/etc/postgresql/server.key:ro,uid=999,gid=999
+      - ../secrets/certs/postgresql/postgresql.crt:/etc/postgresql/server.crt:ro
+      - ../postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ../postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ../postgresql/init-db:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/18/docker
+    env_file: ../.env
+    secrets:
+      - postgres_password
 
   # --------- Keycloak ---------
   keycloak:
@@ -50,7 +58,8 @@ services:
     ]
     restart: always # unless-stopped
     volumes:
-      - ./keycloak/realms.dev.json:/opt/keycloak/data/import/realms.dev.json
+      - ./keycloak/realms.cp.json:/opt/keycloak/data/import/realms.dev.json
+      - ./secrets/certs/ca/ca.crt:/etc/ssl/certs/root.crt:ro
       - ./keycloak/exports:/opt/keycloak/data/export
     environment:
       KC_HTTP_MANAGEMENT_PORT: 9990
@@ -61,19 +70,22 @@ services:
       KC_PROXY: edge
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/realms.dev.json
       KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_PORT: 5432
-      KC_DB_URL_DATABASE: keycloak
+      #      KC_DB_URL_HOST: postgres
+      #      KC_DB_URL_PORT: 5432
+      #      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-ca&sslrootcert=/etc/ssl/certs/root.crt
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
+secrets:
+  postgres_password:
+    file: ../secrets/postgresql/postgresql.password
+
 volumes:
-  mongodb-data:
+  pgdata:
     driver: local
-  postgres-data:
-    driver: local
-  kafka1-data:
-    driver: local
+#  kafka1-data:
+#    driver: local
 
 networks:
   my-network:

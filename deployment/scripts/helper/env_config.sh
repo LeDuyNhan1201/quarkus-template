@@ -1,5 +1,16 @@
-export KEYCLOAK_TAG=26.4.7
-export POSTGRES_TAG=bookworm
+export CA_NAME="BenRootCA"
+export SUBJ_C="VN"
+export SUBJ_ST="BinhTriDong"
+export SUBJ_L="HCM"
+export SUBJ_O="SGU"
+export SUBJ_OU="Dev"
+
+export SECRETS_DIR="secrets"
+export CERTS_DIR="$SECRETS_DIR/certs"
+
+export KEYCLOAK_TAG=26.4.7 # https://quay.io/repository/keycloak/keycloak?tab=tags
+export POSTGRES_TAG=bookworm # https://hub.docker.com/_/postgres/tags
+export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
 
 export POSTGRES_USER=ldnhan
 export POSTGRES_PASSWORD=123
@@ -19,12 +30,12 @@ export NIMBUS_JWT_LIB_VERSION=9.37.2
 export PROMETHEUS_JAVAAGENT_VERSION=1.3.0
 
 # IDP configurations
-export KAFKA_IDP_URL=https://keycloak:8443/
-export KAFKA_IDP_TOKEN_ENDPOINT=https://keycloak:8443/realms/kafka/protocol/openid-connect/token
-export KAFKA_IDP_JWKS_ENDPOINT=https://keycloak:8443/realms/kafka/protocol/openid-connect/certs
-export KAFKA_IDP_EXPECTED_ISSUER=https://keycloak:8443/realms/kafka
-export KAFKA_IDP_AUTH_ENDPOINT=https://keycloak:8443/realms/kafka/protocol/openid-connect/auth
-export KAFKA_IDP_DEVICE_AUTH_ENDPOINT=https://keycloak:8443/realms/kafka/protocol/openid-connect/auth/device
+export KAFKA_IDP_URL=http://keycloak:8080/
+export KAFKA_IDP_TOKEN_ENDPOINT=http://keycloak:8080/realms/kafka/protocol/openid-connect/token
+export KAFKA_IDP_JWKS_ENDPOINT=http://keycloak:8080/realms/kafka/protocol/openid-connect/certs
+export KAFKA_IDP_EXPECTED_ISSUER=http://keycloak:8080/realms/kafka
+export KAFKA_IDP_AUTH_ENDPOINT=http://keycloak:8080/realms/kafka/protocol/openid-connect/auth
+export KAFKA_IDP_DEVICE_AUTH_ENDPOINT=http://keycloak:8080/realms/kafka/protocol/openid-connect/auth/device
 export KAFKA_SUB_CLAIM_NAME=sub
 export KAFKA_SCOPE_CLAIM_NAME=scope
 export KAFKA_GROUP_CLAIM_NAME=groups
