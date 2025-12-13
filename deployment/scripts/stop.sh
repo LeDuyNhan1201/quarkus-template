@@ -15,6 +15,6 @@ sudo rm -rf secrets/*
 sudo rm -rf .env
 
 #docker rmi veg-store/backend-builder:"${BACKEND_VERSION}"
-#docker rmi veg-store/postgres-full-ssl
+docker rmi ldnhan/postgres:"$POSTGRES_TAG"
 
 echo "Done."

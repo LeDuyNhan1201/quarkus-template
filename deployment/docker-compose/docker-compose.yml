@@ -5,7 +5,7 @@ services:
 #      args:
 #        POSTGRES_TAG: ${POSTGRES_TAG:-latest}
 #      context: ../postgresql
-    image: postgres:${POSTGRES_TAG:-latest}
+    image: ldnhan/postgres:${POSTGRES_TAG:-latest}
     container_name: postgres
     ports:
       - "5432:5432"
@@ -24,9 +24,6 @@ services:
       start_period: 30s
     restart: always
     volumes:
-      - ../secrets/certs/ca/ca.crt:/etc/postgresql/root.crt:ro
-      - ../secrets/certs/postgresql/postgresql.key:/etc/postgresql/server.key:ro,uid=999,gid=999
-      - ../secrets/certs/postgresql/postgresql.crt:/etc/postgresql/server.crt:ro
       - ../postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
       - ../postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
       - ../postgresql/init-db:/docker-entrypoint-initdb.d:ro
@@ -73,7 +70,7 @@ services:
       #      KC_DB_URL_HOST: postgres
       #      KC_DB_URL_PORT: 5432
       #      KC_DB_URL_DATABASE: keycloak
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-ca&sslrootcert=/etc/ssl/certs/root.crt
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/etc/ssl/certs/root.crt
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
 

@@ -1,9 +1,9 @@
 ARG POSTGRES_TAG
 FROM postgres:${POSTGRES_TAG}
 
-COPY ../../secrets/certs/postgresql/postgresql.key /etc/postgresql/server.key
-COPY ../../secrets/certs/postgresql/postgresql.crt /etc/postgresql/server.crt
-COPY ../../secrets/certs/ca/ca.crt /etc/postgresql/ca.crt
+COPY secrets/certs/postgresql/postgresql.key /etc/postgresql/server.key
+COPY secrets/certs/postgresql/postgresql.crt /etc/postgresql/server.crt
+COPY secrets/certs/ca/ca.crt /etc/postgresql/ca.crt
 
 RUN chmod 600 /etc/postgresql/server.key
 RUN chown postgres:postgres /etc/postgresql/server.key

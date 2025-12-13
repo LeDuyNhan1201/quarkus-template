@@ -13,12 +13,14 @@ create_client_files
 create_env_file
 
 generate_root_ca
-generate_cert_with_keystore_and_truststore "postgresql" "postgresql"
+generate_cert_with_keystore_and_truststore "postgresql" "postgresql" "postgres"
 generate_cert_with_keystore_and_truststore "keycloak" "keycloak"
 generate_cert_with_keystore_and_truststore "kafka1" "kafka1"
 
-sudo chown root:root secrets/certs/postgresql/postgresql.key
-sudo chmod 600 secrets/certs/postgresql/postgresql.key
+docker build \
+  --build-arg POSTGRES_TAG="$POSTGRES_TAG" \
+  -f postgresql/Dockerfile \
+  -t ldnhan/postgres:"$POSTGRES_TAG" .
 
 #docker compose -f docker-compose/docker-compose."${mode}".yml up -d
-docker compose -f docker-compose/docker-compose.yml up postgres -d
+docker compose -f docker-compose/docker-compose.yml up -d
