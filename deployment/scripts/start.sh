@@ -22,5 +22,10 @@ docker build \
   -f postgresql/Dockerfile \
   -t ldnhan/postgres:"$POSTGRES_TAG" .
 
+docker build \
+  --build-arg KEYCLOAK_TAG="$KEYCLOAK_TAG" \
+  -f keycloak/Dockerfile \
+  -t ldnhan/keycloak:"$KEYCLOAK_TAG" .
+
 #docker compose -f docker-compose/docker-compose."${mode}".yml up -d
 docker compose -f docker-compose/docker-compose.yml up -d

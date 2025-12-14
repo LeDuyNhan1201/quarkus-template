@@ -16,5 +16,6 @@ sudo rm -rf .env
 
 #docker rmi veg-store/backend-builder:"${BACKEND_VERSION}"
 docker rmi ldnhan/postgres:"$POSTGRES_TAG"
+docker rmi ldnhan/keycloak:"$KEYCLOAK_TAG"
 
 echo "Done."
