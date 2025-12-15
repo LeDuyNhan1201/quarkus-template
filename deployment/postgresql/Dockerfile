@@ -12,7 +12,6 @@ RUN chown postgres:postgres /etc/postgresql/server.key
 #    && apt-get install -y --no-install-recommends locales \
 #    && localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8 \
 #    && rm -rf /var/lib/apt/lists/*
-#
 #ENV LANG de_DE.utf8
 
 # Example: install additional packages (e.g. postgis)

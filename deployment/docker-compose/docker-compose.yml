@@ -61,26 +61,25 @@ services:
       retries: 3
     restart: always # unless-stopped
     volumes:
-      - ./keycloak/import/realms.cp.json:/opt/keycloak/data/import/realms.dev.json
-      - ./keycloak/exports:/opt/keycloak/data/export
+      - ../keycloak/import:/opt/keycloak/data/import
     environment:
+      # --- Keycloak Configuration ---
       KC_HTTP_MANAGEMENT_PORT: 9990
       KC_METRICS_ENABLED: true
       KC_HEALTH_ENABLED: true
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      # --- HTTP & Host Configuration ---
+      KC_HOSTNAME: localhost
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: "xforwarded"
-      KC_HOSTNAME: keycloak
-      KEYCLOAK_IMPORT: /opt/keycloak/data/import/realms.dev.json
+      # --- Database Configuration ---
       KC_DB: postgres
-      #      KC_DB_URL_HOST: postgres
-      #      KC_DB_URL_PORT: 5432
-      #      KC_DB_URL_DATABASE: keycloak
-#      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/etc/ssl/certs/root.crt&sslcert=/etc/ssl/certs/server.crt&sslkey=/etc/ssl/certs/server.key
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/etc/ssl/certs/root.crt
+#      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.key
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file: ../.env
 
 secrets:
   postgres_password:
