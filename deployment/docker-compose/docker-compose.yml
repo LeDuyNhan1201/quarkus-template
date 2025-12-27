@@ -28,13 +28,14 @@ services:
       - ../postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
       - ../postgresql/init-db:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/18/docker
-    env_file: ../.env
     secrets:
       - postgres_password
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${POSTGRES_TEXT_PASSWORD} # Use secret instead
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password # Reference to the secret
+      PGDATA: /var/lib/postgresql/18/docker
+    env_file: ../.env
 
   # --------- Keycloak ---------
   keycloak:
@@ -69,7 +70,7 @@ services:
       KC_HEALTH_ENABLED: true
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
-      # --- HTTP & Host Configuration ---
+      # --- HTTP & Host Configuratiown ---
       KC_HOSTNAME: localhost
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: "xforwarded"
@@ -78,7 +79,7 @@ services:
 #      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.key
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt
       KC_DB_USERNAME: ${POSTGRES_USER}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_PASSWORD: ${POSTGRES_TEXT_PASSWORD}
     env_file: ../.env
 
 secrets:

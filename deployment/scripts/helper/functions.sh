@@ -17,11 +17,11 @@ create_env_file() {
     : > secrets/postgresql/postgresql.password
 
     echo "$CERT_SECRET" >> secrets/kafka1/kafka.secret
-    echo "$POSTGRES_PASSWORD" >> secrets/postgresql/postgresql.password
+    echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgresql/postgresql.password
 
     {
       echo POSTGRES_USER="$POSTGRES_USER"
-      echo POSTGRES_PASSWORD="$POSTGRES_PASSWORD"
+      echo POSTGRES_TEXT_PASSWORD="$POSTGRES_TEXT_PASSWORD"
 
       echo MONGODB_USERNAME="$MONGODB_USERNAME"
       echo MONGODB_PASSWORD="$MONGODB_PASSWORD"

@@ -13,7 +13,7 @@ export POSTGRES_TAG=bookworm # https://hub.docker.com/_/postgres/tags
 export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
 
 export POSTGRES_USER=ldnhan
-export POSTGRES_PASSWORD=123
+export POSTGRES_TEXT_PASSWORD=123
 
 export MONGODB_USERNAME=ldnhan
 export MONGODB_PASSWORD=123
