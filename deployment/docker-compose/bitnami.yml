@@ -1,4 +1,4 @@
-bitnami-kafka-env:
+cp-kafka-env:
   &kafka-env
   CLUSTER_ID: "kafka-cluster-1"
   # KRaft Configuration
