@@ -3,7 +3,7 @@ set -euo pipefail
 
 generate_root_ca() {
   local ca_name=$CA_NAME      # e.g. MyCustomCA
-  local ca_days="${2:-365}"     # optional validity days (default: 1 years)
+  local ca_days="${2:-365}"   # optional validity days (default: 1 years)
 
   local ca_dir="$CERTS_DIR/ca"
   local ca_key="$ca_dir/ca.key"
@@ -169,5 +169,5 @@ EOF
 }
 
 # ===== Example usage =====
-# export CERT_SECRET="yourpass"
+# export CERT_SECRET="your-pass"
 # generate_keystore_and_truststore "/path/to/certs" "example.com" "rest_api.example.com" "admin.example.com"

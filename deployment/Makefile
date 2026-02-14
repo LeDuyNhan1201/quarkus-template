@@ -1,6 +1,7 @@
 SHELL:=/bin/bash
 VERSION:=1.0.0
 MODE:=dev
+RUN_ENV:=local
 
 dev-auth:
 	docker exec -it -uroot auth-service bash -c 'cd /app && ./gradlew quarkusDev -DdebugHost=0.0.0.0 -DskipTests';
@@ -19,8 +20,8 @@ start:
 	@echo "Starting..."
 	@sudo chown -R $(shell id -u):$(shell id -g) .
 	@sudo chmod +x scripts/*.sh
-	@./scripts/start.sh $(MODE)
+	@./scripts/$(RUN_ENV)/start.sh $(MODE)
 
 stop:
 	@echo "Stopping..."
-	@./scripts/stop.sh $(MODE)
+	@./scripts/$(RUN_ENV)/stop.sh $(MODE)
