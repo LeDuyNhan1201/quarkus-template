@@ -11,7 +11,7 @@ generate_root_ca() {
 
   # === Prepare ca folder ===
   if [[ -d "$ca_dir" ]]; then
-    rm -rf "$ca_dir"/*
+    rm -rf "${ca_dir:? ca_dir is not set}"/*
   else
     mkdir -p "$ca_dir"
   fi
@@ -51,13 +51,13 @@ generate_cert_with_keystore_and_truststore() {
   local sub_domains=("$@")        # array: sub1.example.com sub2.example.com
 
   local alias_name="${main_domain//./-}"
-  local cert_secret=${CERT_SECRET:?❌ CERT_SECRET is not set}
+  local cert_secret=${CERT_SECRET:? CERT_SECRET is not set}
   local ca_cert="$CERTS_DIR/ca/ca.crt"
   local ca_key="$CERTS_DIR/ca/ca.key"
 
   # === Prepare cert folder ===
   if [[ -d "$cert_dir" ]]; then
-    rm -rf "$cert_dir"/*
+    rm -rf "${cert_dir:? cert_dir is not set}"/*
   else
     mkdir -p "$cert_dir"
   fi
@@ -111,7 +111,7 @@ CN = ${main_domain}
 subjectAltName = @alt_names
 
 [ alt_names ]
-$(printf "$san_text")
+$(printf "%s" "$san_text")
 EOF
 
   # === Generate CSR ===

@@ -12,6 +12,7 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 ENV_FILE="${ROOT_DIR}/helper/env_config.sh"
 FUNCTIONS_FILE="${ROOT_DIR}/helper/functions.sh"
 CERT_SCRIPT="${ROOT_DIR}/helper/generate_certs.sh"
+KEYPAIR_SCRIPT="${ROOT_DIR}/helper/generate_keypair.sh"
 
 # -------------------------------
 # Load Environment & Helpers
@@ -23,6 +24,8 @@ source "${ENV_FILE}"
 source "${FUNCTIONS_FILE}"
 # shellcheck source=/helper/generate_certs.sh
 source "${CERT_SCRIPT}"
+# shellcheck source=/helper/generate_keypair.sh
+source "${KEYPAIR_SCRIPT}"
 
 # -------------------------------
 # Generate Environment & Certificates
@@ -35,6 +38,8 @@ generate_root_ca
 generate_cert_with_keystore_and_truststore "postgres" "postgres" "ldnhan.${MODE}.postgres"
 generate_cert_with_keystore_and_truststore "keycloak" "keycloak" "ldnhan.${MODE}.keycloak"
 generate_cert_with_keystore_and_truststore "kafka0" "kafka0" "ldnhan.${MODE}.kafka0"
+
+generate_jwt_keypair kafka kafka true
 
 # -------------------------------
 # Docker Image Build
@@ -59,4 +64,4 @@ docker build \
 # -------------------------------
 
 # docker compose -f docker-compose/docker-compose."${MODE}".yml up -d
-#docker compose -f docker-compose/docker-compose.yml up -d
+# docker compose -f docker-compose/docker-compose.yml up -d

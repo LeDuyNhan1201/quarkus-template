@@ -16,6 +16,7 @@ export SUBJ_OU="Devops"
 export CERT_SECRET=120103
 export SECRETS_DIR="secrets"
 export CERTS_DIR="$SECRETS_DIR/certs"
+export KEYPAIR_DIR="$SECRETS_DIR/keypair"
 
 export POSTGRES_USER=ldnhan
 export POSTGRES_TEXT_PASSWORD=123
