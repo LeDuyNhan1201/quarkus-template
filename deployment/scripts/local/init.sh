@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 # -------------------------------
@@ -7,17 +7,21 @@ set -euo pipefail
 
 MODE="${1:-dev}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-ENV_FILE="${SCRIPT_DIR}/helper/env_config.sh"
-FUNCTIONS_FILE="${SCRIPT_DIR}/helper/functions.sh"
-CERT_SCRIPT="${SCRIPT_DIR}/helper/generate_certs.sh"
+ENV_FILE="${ROOT_DIR}/helper/env_config.sh"
+FUNCTIONS_FILE="${ROOT_DIR}/helper/functions.sh"
+CERT_SCRIPT="${ROOT_DIR}/helper/generate_certs.sh"
 
 # -------------------------------
 # Load Environment & Helpers
 # -------------------------------
 
+# shellcheck source=/helper/env_config.sh
 source "${ENV_FILE}"
+# shellcheck source=/helper/functions.sh
 source "${FUNCTIONS_FILE}"
+# shellcheck source=/helper/generate_certs.sh
 source "${CERT_SCRIPT}"
 
 # -------------------------------
@@ -28,7 +32,7 @@ create_client_files
 create_env_file
 
 generate_root_ca
-generate_cert_with_keystore_and_truststore "postgresql" "postgres" "ldnhan.${MODE}.postgresql"
+generate_cert_with_keystore_and_truststore "postgres" "postgres" "ldnhan.${MODE}.postgres"
 generate_cert_with_keystore_and_truststore "keycloak" "keycloak" "ldnhan.${MODE}.keycloak"
 generate_cert_with_keystore_and_truststore "kafka0" "kafka0" "ldnhan.${MODE}.kafka0"
 
@@ -55,4 +59,4 @@ docker build \
 # -------------------------------
 
 # docker compose -f docker-compose/docker-compose."${MODE}".yml up -d
-docker compose -f docker-compose/docker-compose.yml up -d
+#docker compose -f docker-compose/docker-compose.yml up -d

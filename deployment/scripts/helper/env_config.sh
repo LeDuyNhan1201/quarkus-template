@@ -11,7 +11,7 @@ export SUBJ_C="VN"
 export SUBJ_ST="BinhTriDong"
 export SUBJ_L="HCM"
 export SUBJ_O="SGU"
-export SUBJ_OU="Dev"
+export SUBJ_OU="Devops"
 
 export CERT_SECRET=120103
 export SECRETS_DIR="secrets"
@@ -34,10 +34,11 @@ export PROMETHEUS_JAVAAGENT_VERSION=1.3.0
 # Kafka advanced configurations
 export BROKER_HEAP=1G
 export SCHEMA_HEAP=512M
-export KAFKA_LISTENER_NAME_INTERNAL_SSL_PRINCIPAL_MAPPING_RULES=RULE:^CN=([a-zA-Z0-9._-]+).*$$/$$1/L,DEFAULT
+export SSL_PRINCIPAL_MAPPING_RULES="RULE:^CN=([a-zA-Z0-9._-]+).*$$/$$1/L,DEFAULT"
 export SSL_CIPHER_SUITES=TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
 # IDP configurations
+export CLUSTER_ID=${NAMESPACE}-${REPOSITORY_NAME}-cluster
 export KAFKA_IDP_URL=http://keycloak:8080/
 export KAFKA_IDP_TOKEN_ENDPOINT=${KAFKA_IDP_URL}realms/kafka/protocol/openid-connect/token
 export KAFKA_IDP_JWKS_ENDPOINT=${KAFKA_IDP_URL}realms/kafka/protocol/openid-connect/certs
@@ -48,6 +49,9 @@ export KAFKA_SUB_CLAIM_NAME=sub
 export KAFKA_SCOPE_CLAIM_NAME=scope
 export KAFKA_GROUP_CLAIM_NAME=groups
 export KAFKA_EXPECTED_AUDIENCE=account
+export KAFKA_PRINCIPAL_BUILDER_CLASS=io.strimzi.kafka.oauth.server.OAuthKafkaPrincipalBuilder
+export SASL_LOGIN_CALLBACK_HANDLER_CLASS=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
+export SASL_SERVER_CALLBACK_HANDLER_CLASS=io.strimzi.kafka.oauth.server.JaasServerOauthValidatorCallbackHandler
 
 # Client configurations
 export KAFKA_SUPERUSER_CLIENT_ID=kafka

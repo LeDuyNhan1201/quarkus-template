@@ -1,12 +1,12 @@
 ARG POSTGRES_TAG=latest
 FROM postgres:${POSTGRES_TAG}
 
-COPY secrets/certs/postgresql/postgresql.key /etc/postgresql/server.key
-COPY secrets/certs/postgresql/postgresql.crt /etc/postgresql/server.crt
-COPY secrets/certs/ca/ca.crt /etc/postgresql/ca.crt
+COPY secrets/certs/postgres/postgres.key /etc/postgres/server.key
+COPY secrets/certs/postgres/postgres.crt /etc/postgres/server.crt
+COPY secrets/certs/ca/ca.crt /etc/postgres/ca.crt
 
-RUN chmod 600 /etc/postgresql/server.key
-RUN chown postgres:postgres /etc/postgresql/server.key
+RUN chmod 600 /etc/postgres/server.key
+RUN chown postgres:postgres /etc/postgres/server.key
 
 #RUN apt-get update \
 #    && apt-get install -y --no-install-recommends locales \

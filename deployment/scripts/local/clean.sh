@@ -7,8 +7,12 @@ set -euo pipefail
 
 MODE="${1:-dev}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+DEPLOYMENT_DIR="$(dirname "$ROOT_DIR")"
 
-ENV_FILE="${SCRIPT_DIR}/helper/env_config.sh"
+ENV_FILE="${ROOT_DIR}/helper/env_config.sh"
+
+# shellcheck source=/helper/env_config.sh
 source "${ENV_FILE}"
 
 IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
@@ -18,7 +22,7 @@ IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
 # -------------------------------
 
 # docker compose -f docker-compose/docker-compose."${MODE}".yml down -v
-docker compose -f docker-compose/docker-compose.yml down -v
+#docker compose -f docker-compose/docker-compose.yml down -v
 
 # -------------------------------
 # Cleanup Files
@@ -26,8 +30,8 @@ docker compose -f docker-compose/docker-compose.yml down -v
 
 echo "Removing certs and environment files..."
 
-rm -rf "${SCRIPT_DIR}/secrets/"*
-rm -f "${SCRIPT_DIR}/.env"
+rm -rf "${DEPLOYMENT_DIR}/secrets/"*
+rm -f "${DEPLOYMENT_DIR}/.env"
 
 # -------------------------------
 # Remove Docker Images

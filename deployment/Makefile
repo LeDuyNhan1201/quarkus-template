@@ -16,12 +16,19 @@ remove-images:
 	docker rmi quarkus/concert-builder
 	docker rmi quarkus/booking-builder
 
-start:
-	@echo "Starting..."
-	@sudo chown -R $(shell id -u):$(shell id -g) .
-	@sudo chmod +x scripts/*.sh
-	@./scripts/$(RUN_ENV)/start.sh $(MODE)
+.PHONY: prepare
+prepare:
+	@echo "Preparing environment..."
+	@sudo apt-get update -y
+	@sudo apt-get install -y make openjdk-17-jdk
+	@find scripts/$(RUN_ENV) -type f -name "*.sh" -exec chmod +x {} \;
 
-stop:
-	@echo "Stopping..."
-	@./scripts/$(RUN_ENV)/stop.sh $(MODE)
+.PHONY: init
+init:
+	@echo "Initializing environment..."
+	@./scripts/$(RUN_ENV)/init.sh $(MODE)
+
+.PHONY: clean
+clean:
+	@echo "Cleaning environment..."
+	@./scripts/$(RUN_ENV)/clean.sh $(MODE)
