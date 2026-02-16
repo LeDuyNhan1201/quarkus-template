@@ -8,29 +8,31 @@ set -euo pipefail
 MODE="${1:-dev}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-DEPLOYMENT_DIR="$(dirname "$ROOT_DIR")"
 
 ENV_FILE="${ROOT_DIR}/helper/env_config.sh"
+FUNCTIONS_FILE="${ROOT_DIR}/helper/functions.sh"
+
+# -------------------------------
+# Load Environment & Helpers
+# -------------------------------
 
 # shellcheck source=/helper/env_config.sh
 source "${ENV_FILE}"
-
-IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
-
-# -------------------------------
-# Cleanup Files
-# -------------------------------
-
-echo "Removing certs and environment files..."
-
-rm -rf "${DEPLOYMENT_DIR}/secrets/"*
-rm -f "${DEPLOYMENT_DIR}/.env"
+# shellcheck source=/helper/functions.sh
+source "${FUNCTIONS_FILE}"
 
 # -------------------------------
-# Remove Docker Images
+# Generate Environment
 # -------------------------------
 
-docker rmi "${IMAGE_PREFIX}/postgres:${POSTGRES_TAG}" || true
-docker rmi "${IMAGE_PREFIX}/keycloak:${KEYCLOAK_TAG}" || true
+create_client_files
+create_env_file
 
-echo "Cleanup completed successfully."
+# -------------------------------
+# Start Containers
+# -------------------------------
+
+#docker compose -f docker-compose/docker-compose."${MODE}".yml up -d
+docker compose -f docker-compose/docker-compose.yml up -d
+
+echo "Start completed successfully."

@@ -18,8 +18,8 @@ generate_jwt_keypair() {
 
   mkdir -p "${KEYPAIR_DIR}/${output_dir}"
 
-  local private_key="${KEYPAIR_DIR}/${output_dir}/${name}.key"
-  local public_key="${KEYPAIR_DIR}/${output_dir}/${name}.pub"
+  local private_key="${KEYPAIR_DIR}/${output_dir}/${name}.key.pem"
+  local public_key="${KEYPAIR_DIR}/${output_dir}/${name}.pub.pem"
 
   if [[ -f "$private_key" && "$overwrite" != "true" ]]; then
     echo "Key already exists: $private_key"

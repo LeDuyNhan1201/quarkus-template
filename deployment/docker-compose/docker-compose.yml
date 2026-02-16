@@ -5,7 +5,7 @@ services:
 #      args:
 #        POSTGRES_TAG: ${POSTGRES_TAG:-latest}
 #      context: ../postgresql
-    image: ldnhan/postgres:${POSTGRES_TAG:-latest}
+    image: ${NAMESPACE}/${REPOSITORY_NAME}/postgres:${POSTGRES_TAG:-latest}
     container_name: postgres
     ports:
       - "5432:5432"
@@ -14,8 +14,8 @@ services:
     command: >
       postgres
       -c max_connections=500
-      -c config_file=/etc/postgresql/postgresql.conf
-      -c hba_file=/etc/postgresql/pg_hba.conf
+      -c config_file=/etc/postgres/postgres.conf
+      -c hba_file=/etc/postgres/pg_hba.conf
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 30s
@@ -24,9 +24,9 @@ services:
       start_period: 30s
     restart: always
     volumes:
-      - ../postgresql/config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
-      - ../postgresql/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
-      - ../postgresql/init-db:/docker-entrypoint-initdb.d:ro
+      - ../postgres/config/postgres.conf:/etc/postgres/postgres.conf:ro
+      - ../postgres/config/pg_hba.conf:/etc/postgres/pg_hba.conf:ro
+      - ../postgres/init-db:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql
     secrets:
       - postgres_password
@@ -39,7 +39,7 @@ services:
 
   # --------- Keycloak ---------
   keycloak:
-    image: ldnhan/keycloak:${KEYCLOAK_TAG:-latest}
+    image: ${NAMESPACE}/${REPOSITORY_NAME}/keycloak:${KEYCLOAK_TAG:-latest}
     container_name: keycloak
     depends_on:
       postgres:
@@ -53,6 +53,7 @@ services:
       "start",
       "--import-realm",
       "--optimized",
+      "--verbose",
     ]
     healthcheck:
       test: [ "CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9990; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9990\r\nConnection: close\r\n\r\n' >&3; cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1" ]
@@ -63,6 +64,7 @@ services:
     restart: always # unless-stopped
     volumes:
       - ../keycloak/import:/opt/keycloak/data/import
+      - ../keycloak/export:/opt/keycloak/data/export
     environment:
       # --- Keycloak Configuration ---
       KC_HTTP_MANAGEMENT_PORT: 9990
@@ -76,20 +78,19 @@ services:
       KC_PROXY_HEADERS: "xforwarded"
       # --- Database Configuration ---
       KC_DB: postgres
-#      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.key
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.pk8
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_TEXT_PASSWORD}
     env_file: ../.env
 
 secrets:
   postgres_password:
-    file: ../secrets/postgresql/postgresql.password
+    file: ../secrets/postgres/postgres.password
 
 volumes:
   pgdata:
     driver: local
-#  kafka1-data:
+#  kafka0-data:
 #    driver: local
 
 networks:

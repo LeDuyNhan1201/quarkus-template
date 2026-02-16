@@ -11,9 +11,8 @@ ENV KC_DB=postgres
 # Add your custom scripts, themes, providers, or other configurations here
 WORKDIR /opt/keycloak
 COPY --chown=keycloak:keycloak secrets/certs/ca/ca.crt conf/root.crt
-#COPY --chown=keycloak:keycloak keycloak/import data/import
-#COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.crt conf/server.crt
-#COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.key conf/server.key
+COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.cert.pem conf/server.crt
+COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.pk8 conf/server.pk8
 RUN /opt/keycloak/bin/kc.sh build
 
 # ------------------ Final stage (Runtime) ------------------

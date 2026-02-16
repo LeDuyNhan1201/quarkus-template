@@ -13,14 +13,19 @@ create_env_file() {
     # Clean old content before overwrite
     : > .env
     mkdir -p secrets/kafka0
-    mkdir -p secrets/postgresql
+    mkdir -p secrets/postgres
     : > secrets/kafka0/kafka.secret
-    : > secrets/postgresql/postgresql.password
+    : > secrets/postgres/postgres.password
 
     echo "$CERT_SECRET" >> secrets/kafka0/kafka.secret
-    echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgresql/postgresql.password
+    echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgres/postgres.password
 
     {
+      echo LOCAL_IP="$LOCAL_IP"
+
+      echo NAMESPACE="$NAMESPACE"
+      echo REPOSITORY_NAME="$REPOSITORY_NAME"
+
       echo KEYCLOAK_TAG="$KEYCLOAK_TAG"
       echo POSTGRES_TAG="$POSTGRES_TAG"
       echo CONFLUENT_TAG="$CONFLUENT_TAG"

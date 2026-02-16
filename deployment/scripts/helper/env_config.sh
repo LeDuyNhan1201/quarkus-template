@@ -6,6 +6,8 @@ export POSTGRES_TAG=14.21-alpine3.23 # https://hub.docker.com/_/postgres/tags
 export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
 export APACHE_KAFKA_TAG=4.2.0-rc4 # https://hub.docker.com/r/apache/kafka/tags
 
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+export LOCAL_IP
 export CA_NAME="LDNhanRootCA"
 export SUBJ_C="VN"
 export SUBJ_ST="BinhTriDong"
@@ -67,7 +69,7 @@ export KAFKA_C3_CLIENT_SECRET=control-center-secret
 export KAFKA_SSO_CLIENT_ID=control-center-sso
 export KAFKA_SSO_CLIENT_SECRET=control-center-sso-secret
 
-export KAFKA_BACKEND_CLIENT_ID=backend-client
+export KAFKA_BACKEND_CLIENT_ID=backend
 export KAFKA_BACKEND_CLIENT_SECRET=backend-secret
 
 export KAFKA_SSO_SUPER_USER_GROUP=sso-users

@@ -2,41 +2,72 @@
 set -euo pipefail
 
 generate_root_ca() {
-  local ca_name=$CA_NAME      # e.g. MyCustomCA
-  local ca_days="${2:-365}"   # optional validity days (default: 1 years)
+  local ca_name=${CA_NAME:? CA_NAME is not set}
+  local ca_days="${1:-3650}"   # default 10 years
 
   local ca_dir="$CERTS_DIR/ca"
   local ca_key="$ca_dir/ca.key"
   local ca_cert="$ca_dir/ca.crt"
 
-  # === Prepare ca folder ===
+  # === Prepare CA folder ===
   if [[ -d "$ca_dir" ]]; then
     rm -rf "${ca_dir:? ca_dir is not set}"/*
   else
     mkdir -p "$ca_dir"
   fi
 
-  # Step 1: Generate CA private key (ECC P-521)
-  echo "Generating Root CA private key (ECC P-521)..."
+  # ============================================================
+  # === Generate Root CA private key (RSA 4096) ===============
+  # ============================================================
+  echo "Generating Root CA private key (RSA 4096)..."
   openssl genpkey \
-      -algorithm EC \
-      -pkeyopt ec_paramgen_curve:secp521r1 \
+      -algorithm RSA \
+      -pkeyopt rsa_keygen_bits:4096 \
       -out "$ca_key"
 
-  # Step 2: Generate Root CA certificate (self-signed)
+  # ============================================================
+  # === Create OpenSSL config for CA ===========================
+  # ============================================================
+  cat > "$ca_dir/ca.openssl.cnf" << EOF
+    [ req ]
+    default_md         = sha512
+    prompt             = no
+    distinguished_name = dn
+    x509_extensions    = v3_ca
+
+    [ dn ]
+    C  = ${SUBJ_C}
+    ST = ${SUBJ_ST}
+    L  = ${SUBJ_L}
+    O  = ${SUBJ_O}
+    OU = ${SUBJ_OU}
+    CN = ${ca_name}
+
+    [ v3_ca ]
+    basicConstraints = critical, CA:TRUE
+    keyUsage = critical, keyCertSign, cRLSign
+    subjectKeyIdentifier = hash
+    authorityKeyIdentifier = keyid:always,issuer
+EOF
+
+  # ============================================================
+  # === Generate self-signed Root CA certificate ===============
+  # ============================================================
   echo "Generating self-signed Root CA certificate..."
-  openssl req -x509 -new -nodes -key "$ca_key" \
-      -sha512 -days "$ca_days" \
-      -subj "/C=${SUBJ_C}/ST=${SUBJ_ST}/L=${SUBJ_L}/O=${SUBJ_O}/OU=${SUBJ_OU}/CN=${ca_name}" \
+  openssl req -x509 -new \
+      -key "$ca_key" \
+      -days "$ca_days" \
+      -config "$ca_dir/ca.openssl.cnf" \
       -out "$ca_cert"
 
   chmod 600 "$ca_key"
   chmod 644 "$ca_cert"
 
-  echo -e "\nRoot CA generated successfully:"
+  echo ""
+  echo "Root CA generated successfully:"
   echo " - CA Key:  $ca_key"
   echo " - CA Cert: $ca_cert"
-  echo "=========================================================================="
+  echo "====================================================================="
 }
 
 # ===== Example usage =====
@@ -44,11 +75,12 @@ generate_root_ca() {
 # generate_root_ca "ExampleCA" 730
 
 generate_cert_with_keystore_and_truststore() {
-  local cert_dir="$CERTS_DIR/$1"  # absolute or relative path
-  local main_domain="$2"          # e.g. example.com
+  local cert_dir="$CERTS_DIR/$1"
+  local main_domain="$2"
+  local local_ip=${LOCAL_IP:? LOCAL_IP is not set}
 
   shift 2
-  local sub_domains=("$@")        # array: sub1.example.com sub2.example.com
+  local sub_domains=("$@")
 
   local alias_name="${main_domain//./-}"
   local cert_secret=${CERT_SECRET:? CERT_SECRET is not set}
@@ -62,85 +94,96 @@ generate_cert_with_keystore_and_truststore() {
     mkdir -p "$cert_dir"
   fi
 
-  # === Generate private key (ECC P-521) ===
-  echo "Generating private key (ECC P-521)..."
+  # ============================================================
+  # === Generate private key (RSA 4096) ========================
+  # ============================================================
+  echo "Generating private key (RSA 4096)..."
   openssl genpkey \
-    -algorithm EC \
-    -pkeyopt ec_paramgen_curve:secp521r1 \
+    -algorithm RSA \
+    -pkeyopt rsa_keygen_bits:4096 \
     -out "$cert_dir/$alias_name.key.pem"
 
-  openssl genpkey \
-    -algorithm EC \
-    -pkeyopt ec_paramgen_curve:secp521r1 \
-    -out "$cert_dir/$alias_name.key"
-
-  # === Create OpenSSL config ===
+  # ============================================================
+  # === Create OpenSSL config (SAN support) ====================
+  # ============================================================
   echo "Creating OpenSSL config with SANs..."
+
   local san_text=""
   local count=1
-  san_text+="DNS.${count} = ${main_domain}\n"; ((count++))
-  san_text+="DNS.${count} = localhost\n"; ((count++))
-  san_text+="DNS.${count} = 127.0.0.1\n"; ((count++))
 
-  # Only add extra subdomains if provided
+  san_text+="DNS.${count} = ${main_domain}"$'\n'; ((count++))
+  san_text+="DNS.${count} = localhost"$'\n'; ((count++))
+  san_text+="IP.${count} = ${local_ip}"$'\n'; ((count++))
+  san_text+="IP.${count} = 127.0.0.1"$'\n'; ((count++))
+
   if [[ ${#sub_domains[@]} -gt 0 ]]; then
     for sub in "${sub_domains[@]}"; do
       if [[ -n "$sub" ]]; then
-        san_text+="DNS.${count} = ${sub}\n"
+        san_text+="DNS.${count} = ${sub}"$'\n'
         ((count++))
       fi
     done
   fi
 
   cat > "$cert_dir/$alias_name.openssl.cnf" << EOF
-[ req ]
-prompt             = no
-default_md         = sha512
-distinguished_name = dn
-req_extensions     = req_ext
+    [ req ]
+    prompt             = no
+    default_md         = sha512
+    distinguished_name = dn
+    req_extensions     = req_ext
 
-[ dn ]
-C = ${SUBJ_C}
-ST = ${SUBJ_ST}
-L = ${SUBJ_L}
-O = ${SUBJ_O}
-OU = ${SUBJ_OU}
-CN = ${main_domain}
+    [ dn ]
+    C = ${SUBJ_C}
+    ST = ${SUBJ_ST}
+    L = ${SUBJ_L}
+    O = ${SUBJ_O}
+    OU = ${SUBJ_OU}
+    CN = ${main_domain}
 
-[ req_ext ]
-subjectAltName = @alt_names
+    [ req_ext ]
+    subjectAltName = @alt_names
 
-[ alt_names ]
-$(printf "%s" "$san_text")
+    [ alt_names ]
+    $(printf "%s" "$san_text")
 EOF
 
-  # === Generate CSR ===
-  echo "Generating certificate signing request (CSR)..."
+  # ============================================================
+  # === Generate CSR ===========================================
+  # ============================================================
+  echo "Generating CSR..."
   openssl req -new \
     -key "$cert_dir/$alias_name.key.pem" \
     -out "$cert_dir/$alias_name.csr.pem" \
     -config "$cert_dir/$alias_name.openssl.cnf"
 
-  openssl req -new \
-    -key "$cert_dir/$alias_name.key" \
-    -out "$cert_dir/$alias_name.csr" \
-    -config "$cert_dir/$alias_name.openssl.cnf"
-
-  # === Sign cert with CA ===
+  # ============================================================
+  # === Sign with CA ===========================================
+  # ============================================================
   echo "Signing certificate with CA..."
   openssl x509 -req \
     -in "$cert_dir/$alias_name.csr.pem" \
     -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial \
-    -out "$cert_dir/$alias_name.cert.pem" -days 365 -sha512 \
-    -extfile "$cert_dir/$alias_name.openssl.cnf" -extensions req_ext
+    -out "$cert_dir/$alias_name.cert.pem" \
+    -days 365 \
+    -sha512 \
+    -extfile "$cert_dir/$alias_name.openssl.cnf" \
+    -extensions req_ext
 
-  openssl x509 -req \
-    -in "$cert_dir/$alias_name.csr" \
-    -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial \
-    -out "$cert_dir/$alias_name.crt" -days 365 -sha512 \
-    -extfile "$cert_dir/$alias_name.openssl.cnf" -extensions req_ext
+  # ============================================================
+  # === Convert to PKCS8 DER for PostgreSQL ====================
+  # ============================================================
+  echo "Converting private key to PKCS8 DER (.pk8)..."
+  openssl pkcs8 \
+    -topk8 \
+    -inform PEM \
+    -outform DER \
+    -in "$cert_dir/$alias_name.key.pem" \
+    -out "$cert_dir/$alias_name.pk8" \
+    -nocrypt
 
-  # === Create PKCS#12 keystore ===
+  # ============================================================
+  # === Create PKCS#12 keystore ================================
+  # ============================================================
   echo "Creating PKCS#12 keystore..."
   openssl pkcs12 -export \
     -inkey "$cert_dir/$alias_name.key.pem" \
@@ -150,7 +193,9 @@ EOF
     -out "$cert_dir/$alias_name.keystore.p12" \
     -name "$alias_name"
 
-  # === Create PKCS#12 truststore ===
+  # ============================================================
+  # === Create PKCS#12 truststore ==============================
+  # ============================================================
   echo "Creating PKCS#12 truststore..."
   keytool -importcert \
     -noprompt \
@@ -161,11 +206,13 @@ EOF
     -storetype PKCS12 \
     -storepass "$cert_secret"
 
-  # === Permissions ===
-  chmod 644 "$cert_dir"/*.pem "$cert_dir"/*.p12 "$cert_dir"/*.csr "$cert_dir"/*.crt
+  # ============================================================
+  # === Permissions ============================================
+  # ============================================================
+  chmod 644 "$cert_dir"/*.pem "$cert_dir"/*.pk8 "$cert_dir"/*.p12
 
-  echo "[$main_domain] All certs, Keystore and truststore generation complete!"
-  echo "=========================================================================="
+  echo "[$main_domain] RSA cert + keystore + truststore generation complete!"
+  echo "====================================================================="
 }
 
 # ===== Example usage =====

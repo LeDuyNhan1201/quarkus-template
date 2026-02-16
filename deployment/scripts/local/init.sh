@@ -49,7 +49,7 @@ IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
 
 docker build \
   --build-arg POSTGRES_TAG="${POSTGRES_TAG}" \
-  -f postgresql/Dockerfile \
+  -f postgres/Dockerfile \
   -t "${IMAGE_PREFIX}/postgres:${POSTGRES_TAG}" \
   .
 
@@ -59,9 +59,4 @@ docker build \
   -t "${IMAGE_PREFIX}/keycloak:${KEYCLOAK_TAG}" \
   .
 
-# -------------------------------
-# Start Containers
-# -------------------------------
-
-# docker compose -f docker-compose/docker-compose."${MODE}".yml up -d
-# docker compose -f docker-compose/docker-compose.yml up -d
+echo "Initialize completed successfully."
