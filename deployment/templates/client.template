@@ -1,24 +1,30 @@
+############################
+# TLS TO BROKER
+############################
 security.protocol=SASL_SSL
-ssl.keystore.type=PKCS12
-ssl.keystore.location=/etc/kafka/secrets/keystore.p12
-ssl.keystore.password=${CERT_SECRET}
-ssl.key.password=${CERT_SECRET}
 ssl.truststore.type=PKCS12
 ssl.truststore.location=/etc/kafka/secrets/truststore.p12
 ssl.truststore.password=${CERT_SECRET}
 sasl.mechanism=OAUTHBEARER
-sasl.login.callback.handler.class=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
-sasl.oauthbearer.token.endpoint.url=${KAFKA_IDP_TOKEN_ENDPOINT}
-sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
-    oauth.client.id="${KAFKA_SUPERUSER_CLIENT_ID}" \
-    oauth.client.secret="${KAFKA_SUPERUSER_CLIENT_SECRET}" \
+
+############################
+# STRIMZI LOGIN HANDLER
+############################
+sasl.login.callback.handler.class=${SASL_LOGIN_CALLBACK_HANDLER_CLASS}
+
+############################
+# OAUTH JAAS CONFIG
+############################
+sasl.jaas.config=\
+org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
     oauth.token.endpoint.uri="${KAFKA_IDP_TOKEN_ENDPOINT}" \
-    principalClaimName="${KAFKA_SUB_CLAIM_NAME}" \
-    refresh_ms="3000" \
-    oauth.ssl.keystore.type=PKCS12 \
-    oauth.ssl.keystore.location="/etc/kafka/secrets/keystore.p12" \
-    oauth.ssl.keystore.password="${CERT_SECRET}" \
-    oauth.ssl.key.password="${CERT_SECRET}" \
+    oauth.client.id="${KAFKA_BACKEND_CLIENT_ID}" \
+    oauth.assertion.private.key.file="/etc/kafka/secrets/oauth/private.key" \
+    oauth.assertion.private.key.passphrase="${CERT_SECRET}" \
+    oauth.assertion.algorithm="RS256" \
+    oauth.scope="kafka.produce kafka.consume" \
+    oauth.groups="${KAFKA_IDP_GROUP_CLAIM_NAME}" \
+    oauth.audience="${KAFKA_IDP_EXPECTED_AUDIENCE}" \
     oauth.ssl.truststore.type="PKCS12" \
     oauth.ssl.truststore.location="/etc/kafka/secrets/truststore.p12" \
     oauth.ssl.truststore.password="${CERT_SECRET}";
