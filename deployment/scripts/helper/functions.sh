@@ -17,6 +17,11 @@ create_env_file() {
     : > secrets/kafka0/kafka.secret
     : > secrets/postgres/postgres.password
 
+    # Create and delegate root access for kafka brokers logs folder
+    mkdir -p kafka/kafka0-logs
+    sudo chown -R 1000:1000 kafka/kafka0-logs
+    sudo chmod -R 755 kafka/kafka0-logs
+
     echo "$CERT_SECRET" >> secrets/kafka0/kafka.secret
     echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgres/postgres.password
 
