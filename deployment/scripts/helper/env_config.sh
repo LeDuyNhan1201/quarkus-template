@@ -1,10 +1,10 @@
 export NAMESPACE="ldnhan"
 export REPOSITORY_NAME="kafka-sample"
 
-export KEYCLOAK_TAG=26.5.3 # https://quay.io/repository/keycloak/keycloak?tab=tags
-export POSTGRES_TAG=14.21-alpine3.23 # https://hub.docker.com/_/postgres/tags
+export KEYCLOAK_TAG=nightly # https://quay.io/repository/keycloak/keycloak?tab=tags
+export POSTGRES_TAG=16.13-alpine3.23 # https://hub.docker.com/_/postgres/tags
 export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
-export APACHE_KAFKA_TAG=4.2.0-rc4 # https://hub.docker.com/r/apache/kafka/tags
+export APACHE_KAFKA_TAG=4.0.2-rc3 # https://hub.docker.com/r/apache/kafka-native/tags
 
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 export LOCAL_IP
