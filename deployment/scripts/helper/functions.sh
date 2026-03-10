@@ -5,22 +5,37 @@ create_client_files() {
   echo "Creating kafka client files"
   rm -rf kafka/configs/*
 
-  envsubst < templates/server.template > kafka/configs/server.properties
+#  envsubst < templates/server.template > kafka/configs/server.properties
   envsubst < templates/client.template > kafka/configs/client.properties
 }
 
+create_data_folders() {
+    # Create and delegate root access for kafka brokers logs folder
+    mkdir -p kafka/kafka0-logs
+    sudo chown -R 1000:1000 kafka/kafka0-logs
+    sudo chmod -R 755 kafka/kafka0-logs
+
+    # Create and delegate root access for kafka brokers config folder
+    mkdir -p kafka/kafka0-config
+    sudo chown -R 1000:1000 kafka/kafka0-config
+    sudo chmod -R 755 kafka/kafka0-config
+
+    # Create and delegate root access for kafka brokers kraft folder
+    mkdir -p kafka/kafka0-kraft
+    sudo chmod -R 755 kafka/kafka0-kraft
+    sudo chown -R 1000:1000 kafka/kafka0-kraft
+}
+
 create_env_file() {
+    echo "Creating env files"
+    rm -rf secrets/*
+
     # Clean old content before overwrite
     : > .env
     mkdir -p secrets/kafka0
     mkdir -p secrets/postgres
     : > secrets/kafka0/kafka.secret
     : > secrets/postgres/postgres.password
-
-    # Create and delegate root access for kafka brokers logs folder
-    mkdir -p kafka/kafka0-logs
-    sudo chown -R 1000:1000 kafka/kafka0-logs
-    sudo chmod -R 755 kafka/kafka0-logs
 
     echo "$CERT_SECRET" >> secrets/kafka0/kafka.secret
     echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgres/postgres.password
@@ -65,10 +80,11 @@ create_env_file() {
       echo KAFKA_IDP_EXPECTED_ISSUER="$KAFKA_IDP_EXPECTED_ISSUER"
       echo KAFKA_IDP_AUTH_ENDPOINT="$KAFKA_IDP_AUTH_ENDPOINT"
       echo KAFKA_IDP_AUTH_DEVICE_ENDPOINT="$KAFKA_IDP_AUTH_DEVICE_ENDPOINT"
-      echo KAFKA_SUB_CLAIM_NAME="$KAFKA_SUB_CLAIM_NAME"
-      echo KAFKA_SCOPE_CLAIM_NAME="$KAFKA_SCOPE_CLAIM_NAME"
-      echo KAFKA_GROUP_CLAIM_NAME="$KAFKA_GROUP_CLAIM_NAME"
-      echo KAFKA_EXPECTED_AUDIENCE="$KAFKA_EXPECTED_AUDIENCE"
+      echo KAFKA_IDP_SUB_CLAIM_NAME="$KAFKA_IDP_SUB_CLAIM_NAME"
+      echo KAFKA_IDP_SCOPE_CLAIM_NAME="$KAFKA_IDP_SCOPE_CLAIM_NAME"
+      echo KAFKA_IDP_GROUP_CLAIM_NAME="$KAFKA_IDP_GROUP_CLAIM_NAME"
+      echo KAFKA_IDP_EXPECTED_AUDIENCE="$KAFKA_IDP_EXPECTED_AUDIENCE"
+      echo KAFKA_AUTHORIZER_CLASS="$KAFKA_AUTHORIZER_CLASS"
       echo KAFKA_PRINCIPAL_BUILDER_CLASS="$KAFKA_PRINCIPAL_BUILDER_CLASS"
       echo SASL_LOGIN_CALLBACK_HANDLER_CLASS="$SASL_LOGIN_CALLBACK_HANDLER_CLASS"
       echo SASL_SERVER_CALLBACK_HANDLER_CLASS="$SASL_SERVER_CALLBACK_HANDLER_CLASS"

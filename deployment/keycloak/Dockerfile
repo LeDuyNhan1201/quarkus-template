@@ -1,7 +1,8 @@
 ARG KEYCLOAK_TAG=latest
 
 # ------------------ Build stage (Builder) ------------------
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG} AS builder
+#FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG} AS builder
+FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG}
 
 # Define ENV for build configuration here
 ENV KC_HEALTH_ENABLED=true

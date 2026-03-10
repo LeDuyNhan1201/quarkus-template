@@ -23,8 +23,8 @@ IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
 
 echo "Removing certs and environment files..."
 
-rm -rf "${DEPLOYMENT_DIR}/secrets/"*
-rm -f "${DEPLOYMENT_DIR}/.env"
+sudo rm -rf "${DEPLOYMENT_DIR}/secrets/"*
+sudo rm -f "${DEPLOYMENT_DIR}/.env"
 
 # -------------------------------
 # Remove Docker Images

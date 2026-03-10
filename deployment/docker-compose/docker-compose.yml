@@ -4,11 +4,11 @@ services:
 #    build:
 #      args:
 #        POSTGRES_TAG: ${POSTGRES_TAG:-latest}
-#      context: ../postgresql
+#      context: ../postgres
     image: ${NAMESPACE}/${REPOSITORY_NAME}/postgres:${POSTGRES_TAG:-latest}
     container_name: postgres
     ports:
-      - "5432:5432"
+      - "5438:5432"
     networks:
       - my-network
     command: >
@@ -45,8 +45,8 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "8080:8080" # HTTP
-      - "9990:9990" # Management port
+      - "8088:8080" # HTTP
+      - "9998:9990" # Management port
     networks:
       - my-network
     command: [

@@ -1,4 +1,4 @@
-export NAMESPACE="ldnhan"
+export NAMESPACE="leduynhan1201"
 export REPOSITORY_NAME="kafka-sample"
 
 export KEYCLOAK_TAG=nightly # https://quay.io/repository/keycloak/keycloak?tab=tags
@@ -32,7 +32,7 @@ export KC_BOOTSTRAP_ADMIN_PASSWORD=123
 # External Kafka library versions
 export KAFKA_OAUTH_LIB_VERSION=0.15.1
 export NIMBUS_JWT_LIB_VERSION=9.37.2
-export PROMETHEUS_JAVAAGENT_VERSION=1.3.0
+export PROMETHEUS_JAVAAGENT_VERSION=1.5.0
 
 # Kafka advanced configurations
 export BROKER_HEAP=1G
@@ -52,6 +52,7 @@ export KAFKA_IDP_SUB_CLAIM_NAME=sub
 export KAFKA_IDP_SCOPE_CLAIM_NAME=scope
 export KAFKA_IDP_GROUP_CLAIM_NAME=groups
 export KAFKA_IDP_EXPECTED_AUDIENCE=account
+export KAFKA_AUTHORIZER_CLASS=io.strimzi.kafka.oauth.server.authorizer.KeycloakAuthorizer
 export KAFKA_PRINCIPAL_BUILDER_CLASS=io.strimzi.kafka.oauth.server.OAuthKafkaPrincipalBuilder
 export SASL_LOGIN_CALLBACK_HANDLER_CLASS=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
 export SASL_SERVER_CALLBACK_HANDLER_CLASS=io.strimzi.kafka.oauth.server.JaasServerOauthValidatorCallbackHandler

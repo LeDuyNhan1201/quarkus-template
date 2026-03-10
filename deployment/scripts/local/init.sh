@@ -33,6 +33,7 @@ source "${KEYPAIR_SCRIPT}"
 
 create_client_files
 create_env_file
+create_data_folders
 
 generate_root_ca
 generate_cert_with_keystore_and_truststore "postgres" "postgres" "ldnhan.${MODE}.postgres"
