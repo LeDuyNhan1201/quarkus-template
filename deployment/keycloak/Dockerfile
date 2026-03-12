@@ -1,25 +1,45 @@
 ARG KEYCLOAK_TAG=latest
 
-# ------------------ Build stage (Builder) ------------------
-#FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG} AS builder
-FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG}
+# ================= BUILD STAGE =================
+FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG} AS builder
 
-# Define ENV for build configuration here
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 
-# Add your custom scripts, themes, providers, or other configurations here
 WORKDIR /opt/keycloak
+
+# Copy certificates
 COPY --chown=keycloak:keycloak secrets/certs/ca/ca.crt conf/root.crt
 COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.cert.pem conf/server.crt
-COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.pk8 conf/server.pk8
+COPY --chown=keycloak:keycloak secrets/certs/keycloak/keycloak.key.pem conf/server.key
+
+RUN chmod 600 conf/server.key
+
+# Copy custom providers (SPI)
+# COPY providers/*.jar providers/
+
+# Copy themes if needed
+# COPY themes/ themes/
+
+# Build optimized Keycloak distribution
 RUN /opt/keycloak/bin/kc.sh build
 
-# ------------------ Final stage (Runtime) ------------------
+
+# ================= RUNTIME STAGE =================
 FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG}
+
+WORKDIR /opt/keycloak
+
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
-# Define ENV for runtime configuration here if needed
+ENV KC_HEALTH_ENABLED=true
+ENV KC_METRICS_ENABLED=true
+ENV KC_DB=postgres
+
+# TLS
+#ENV KC_HOSTNAME_STRICT=true
+#ENV KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt
+#ENV KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]

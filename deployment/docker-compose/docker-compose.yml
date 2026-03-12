@@ -78,7 +78,7 @@ services:
       KC_PROXY_HEADERS: "xforwarded"
       # --- Database Configuration ---
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.pk8
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak?sslmode=verify-full&sslrootcert=/opt/keycloak/conf/root.crt&sslcert=/opt/keycloak/conf/server.crt&sslkey=/opt/keycloak/conf/server.key
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_TEXT_PASSWORD}
     env_file: ../.env

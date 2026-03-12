@@ -526,8 +526,9 @@ services:
       retries: 3
     restart: always # unless-stopped
     volumes:
-      - kafka0-data:/var/lib/kafka-logs
-      - ../kafka/configs:/tmp/configs
+      - ../data/kafka0-data:/var/lib/kafka-logs
+      - ../data/kafka0-config:/opt/kafka/config
+      - ../data/kafka0-logs:/opt/kafka/logs
       - ../kafka/libs:/opt/kafka/plugins
 #      - ../kafka/libs/kafka-oauth-common-${KAFKA_OAUTH_LIB_VERSION}.jar:/usr/share/java/kafka/kafka-oauth-common.jar
 #      - ../kafka/libs/kafka-oauth-server-${KAFKA_OAUTH_LIB_VERSION}.jar:/usr/share/java/kafka/kafka-oauth-server.jar

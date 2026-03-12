@@ -29,6 +29,7 @@ replay_pid*
 **/keypairs/
 **/.gradle
 **/build/
+**/data/
 
 **/tempo/data/
 **/loki/data/

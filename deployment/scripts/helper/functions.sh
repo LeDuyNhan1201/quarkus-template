@@ -10,20 +10,24 @@ create_client_files() {
 }
 
 create_data_folders() {
+    mkdir -p data
+    sudo chown -R 1000:1000 data
+    sudo chmod -R 755 data
+
     # Create and delegate root access for kafka brokers logs folder
-    mkdir -p kafka/kafka0-logs
-    sudo chown -R 1000:1000 kafka/kafka0-logs
-    sudo chmod -R 755 kafka/kafka0-logs
+    mkdir -p data/kafka0-logs
+    sudo chown -R 1000:1000 data/kafka0-logs
+    sudo chmod -R 755 data/kafka0-logs
 
     # Create and delegate root access for kafka brokers config folder
-    mkdir -p kafka/kafka0-config
-    sudo chown -R 1000:1000 kafka/kafka0-config
-    sudo chmod -R 755 kafka/kafka0-config
+    mkdir -p data/kafka0-config
+    sudo chown -R 1000:1000 data/kafka0-config
+    sudo chmod -R 755 data/kafka0-config
 
     # Create and delegate root access for kafka brokers kraft folder
-    mkdir -p kafka/kafka0-kraft
-    sudo chmod -R 755 kafka/kafka0-kraft
-    sudo chown -R 1000:1000 kafka/kafka0-kraft
+    mkdir -p data/kafka0-data
+    sudo chmod -R 755 data/kafka0-data
+    sudo chown -R 1000:1000 data/kafka0-data
 }
 
 create_env_file() {

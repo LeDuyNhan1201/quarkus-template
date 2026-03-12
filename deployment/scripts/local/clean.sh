@@ -21,9 +21,10 @@ IMAGE_PREFIX="${NAMESPACE}/${REPOSITORY_NAME}"
 # Cleanup Files
 # -------------------------------
 
-echo "Removing certs and environment files..."
+echo "Removing certs, data and environment files..."
 
 sudo rm -rf "${DEPLOYMENT_DIR}/secrets/"*
+sudo rm -rf "${DEPLOYMENT_DIR}/data/"*
 sudo rm -f "${DEPLOYMENT_DIR}/.env"
 
 # -------------------------------
