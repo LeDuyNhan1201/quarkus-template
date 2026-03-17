@@ -29,25 +29,25 @@ generate_root_ca() {
   # === Create OpenSSL config for CA ===========================
   # ============================================================
   cat > "$ca_dir/ca.openssl.cnf" << EOF
-    [ req ]
-    default_md         = sha512
-    prompt             = no
-    distinguished_name = dn
-    x509_extensions    = v3_ca
+[ req ]
+default_md         = sha512
+prompt             = no
+distinguished_name = dn
+x509_extensions    = v3_ca
 
-    [ dn ]
-    C  = ${SUBJ_C}
-    ST = ${SUBJ_ST}
-    L  = ${SUBJ_L}
-    O  = ${SUBJ_O}
-    OU = ${SUBJ_OU}
-    CN = ${ca_name}
+[ dn ]
+C  = ${SUBJ_C}
+ST = ${SUBJ_ST}
+L  = ${SUBJ_L}
+O  = ${SUBJ_O}
+OU = ${SUBJ_OU}
+CN = ${ca_name}
 
-    [ v3_ca ]
-    basicConstraints = critical, CA:TRUE
-    keyUsage = critical, keyCertSign, cRLSign
-    subjectKeyIdentifier = hash
-    authorityKeyIdentifier = keyid:always,issuer
+[ v3_ca ]
+basicConstraints = critical, CA:TRUE
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
 EOF
 
   # ============================================================
@@ -126,25 +126,25 @@ generate_cert_with_keystore_and_truststore() {
   fi
 
   cat > "$cert_dir/$alias_name.openssl.cnf" << EOF
-    [ req ]
-    prompt             = no
-    default_md         = sha512
-    distinguished_name = dn
-    req_extensions     = req_ext
+[ req ]
+prompt             = no
+default_md         = sha512
+distinguished_name = dn
+req_extensions     = req_ext
 
-    [ dn ]
-    C = ${SUBJ_C}
-    ST = ${SUBJ_ST}
-    L = ${SUBJ_L}
-    O = ${SUBJ_O}
-    OU = ${SUBJ_OU}
-    CN = ${main_domain}
+[ dn ]
+C = ${SUBJ_C}
+ST = ${SUBJ_ST}
+L = ${SUBJ_L}
+O = ${SUBJ_O}
+OU = ${SUBJ_OU}
+CN = ${main_domain}
 
-    [ req_ext ]
-    subjectAltName = @alt_names
+[ req_ext ]
+subjectAltName = @alt_names
 
-    [ alt_names ]
-    $(printf "%s" "$san_text")
+[ alt_names ]
+$(printf "%s" "$san_text")
 EOF
 
   # ============================================================

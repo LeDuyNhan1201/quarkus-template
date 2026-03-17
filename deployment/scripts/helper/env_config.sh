@@ -5,9 +5,15 @@ export KEYCLOAK_TAG=nightly # https://quay.io/repository/keycloak/keycloak?tab=t
 export POSTGRES_TAG=16.13-alpine3.23 # https://hub.docker.com/_/postgres/tags
 export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
 export APACHE_KAFKA_TAG=4.0.2-rc3 # https://hub.docker.com/r/apache/kafka-native/tags
+export ENVOY_TAG=tools-dev # https://hub.docker.com/r/envoyproxy/envoy/tags
 
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 export LOCAL_IP
+export GATEWAY_PORT=8889
+export KEYCLOAK_HOSTNAME="keycloak.${NAMESPACE}.${MODE}"
+export POSTGRES_HOSTNAME="postgres.${NAMESPACE}.${MODE}"
+export KAFKA_UI_HOSTNAME="kafka-ui.${NAMESPACE}.${MODE}"
+export ENVOY_HOSTNAME="*.${NAMESPACE}.${MODE}"
 export CA_NAME="LDNhanRootCA"
 export SUBJ_C="VN"
 export SUBJ_ST="BinhTriDong"
@@ -17,6 +23,7 @@ export SUBJ_OU="Devops"
 
 export CERT_SECRET=120103
 export SECRETS_DIR="secrets"
+export DATA_DIR="data"
 export CERTS_DIR="$SECRETS_DIR/certs"
 export KEYPAIR_DIR="$SECRETS_DIR/keypair"
 
@@ -37,12 +44,12 @@ export PROMETHEUS_JAVAAGENT_VERSION=1.5.0
 # Kafka advanced configurations
 export BROKER_HEAP=1G
 export SCHEMA_HEAP=512M
-export SSL_PRINCIPAL_MAPPING_RULES="RULE:^CN=([a-zA-Z0-9._-]+).*$$/$$1/L,DEFAULT"
+export SSL_PRINCIPAL_MAPPING_RULES='RULE:^CN=([a-zA-Z0-9._-]+).*$$/$$1/L,DEFAULT'
 export SSL_CIPHER_SUITES=TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 
 # IDP configurations
 export CLUSTER_ID=${NAMESPACE}-${REPOSITORY_NAME}-cluster
-export KAFKA_IDP_URL=http://keycloak:8080/
+export KAFKA_IDP_URL=http://${KEYCLOAK_HOSTNAME}:${GATEWAY_PORT}/
 export KAFKA_IDP_TOKEN_ENDPOINT=${KAFKA_IDP_URL}realms/kafka/protocol/openid-connect/token
 export KAFKA_IDP_JWKS_ENDPOINT=${KAFKA_IDP_URL}realms/kafka/protocol/openid-connect/certs
 export KAFKA_IDP_EXPECTED_ISSUER=${KAFKA_IDP_URL}realms/kafka

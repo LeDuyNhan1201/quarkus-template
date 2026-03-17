@@ -12,6 +12,8 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 ENV_FILE="${ROOT_DIR}/helper/env_config.sh"
 FUNCTIONS_FILE="${ROOT_DIR}/helper/functions.sh"
+CERT_SCRIPT="${ROOT_DIR}/helper/generate_certs.sh"
+KEYPAIR_SCRIPT="${ROOT_DIR}/helper/generate_keypair.sh"
 
 # -------------------------------
 # Load Environment & Helpers
@@ -21,20 +23,25 @@ FUNCTIONS_FILE="${ROOT_DIR}/helper/functions.sh"
 source "${ENV_FILE}"
 # shellcheck source=/helper/functions.sh
 source "${FUNCTIONS_FILE}"
+# shellcheck source=/helper/generate_certs.sh
+source "${CERT_SCRIPT}"
+
+server_name="${2:? server_name is not set}"
+server_dir="${CERTS_DIR}/${server_name}"
+
+if [[ -d "$server_dir" ]]; then
+    rm -rf "${server_dir:? server_dir is not set}"/*
+else
+    mkdir -p "$server_dir"
+fi
 
 # -------------------------------
-# Generate Environment
+# Generate Environment & Certificates
 # -------------------------------
 
-create_client_files
 create_env_file
 create_secrets
 
-# -------------------------------
-# Start Containers
-# -------------------------------
+generate_cert_with_keystore_and_truststore "${server_name}" "${server_name}" "${server_name}.${NAMESPACE}.${MODE}"
 
-#docker compose -f docker-compose/docker-compose."${MODE}".yml up -d
-docker compose -f docker-compose/docker-compose.yml up -d
-
-echo "Start completed successfully."
+echo "${server_name}'s certificates generated successfully."

@@ -1,5 +1,4 @@
-x-kafka-env:
-  &ldnhan-kafka-env
+x-kafka-env: &ldnhan-kafka-env
   ########################################
   # KRaft Cluster Identity
   ########################################
@@ -374,10 +373,10 @@ x-kafka-env:
   KAFKA_SSL_KEYSTORE_FILENAME: 'keystore.p12'
   # Filename inside mounted secrets' directory.
 
-  KAFKA_SSL_KEYSTORE_CREDENTIALS: 'kafka.secret'
+  KAFKA_SSL_KEYSTORE_CREDENTIALS: '/run/secrets/kafka_secret'
   # File containing keystore password (alternative to env var).
 
-  KAFKA_SSL_KEY_CREDENTIALS: 'kafka.secret'
+  KAFKA_SSL_KEY_CREDENTIALS: '/run/secrets/kafka_secret'
   # File containing private key password.
 
   ############################################
@@ -397,7 +396,7 @@ x-kafka-env:
   KAFKA_SSL_TRUSTSTORE_FILENAME: 'truststore.p12'
   # Filename inside mounted secrets' directory.
 
-  KAFKA_SSL_TRUSTSTORE_CREDENTIALS: 'kafka.secret'
+  KAFKA_SSL_TRUSTSTORE_CREDENTIALS: '/run/secrets/kafka_secret'
   # File containing truststore password.
 
   # Internal Listener
@@ -433,7 +432,7 @@ x-kafka-env:
   #  KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_TYPE: 'PKCS12'
   #  KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_LOCATION: '/etc/kafka/secrets/truststore.p12'
   #  KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_PASSWORD: ${CERT_SECRET}
-  #  KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_CREDENTIALS: 'kafka.secret'
+  #  KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_CREDENTIALS: '/run/secrets/kafka_secret'
   #  KAFKA_LISTENER_NAME_INTERNAL_SSL_PRINCIPAL_MAPPING_RULES: ${SSL_PRINCIPAL_MAPPING_RULES}
 
   # Controller Listener
@@ -446,7 +445,7 @@ x-kafka-env:
   #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_TRUSTSTORE_TYPE: 'PKCS12'
   #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_TRUSTSTORE_LOCATION: '/etc/kafka/secrets/truststore.p12'
   #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_TRUSTSTORE_PASSWORD: ${CERT_SECRET}
-  #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_TRUSTSTORE_CREDENTIALS: 'kafka.secret'
+  #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_TRUSTSTORE_CREDENTIALS: '/run/secrets/kafka_secret'
   #  KAFKA_LISTENER_NAME_CONTROLLER_SSL_PRINCIPAL_MAPPING_RULES: ${SSL_PRINCIPAL_MAPPING_RULES}
 
   # External listener
@@ -491,7 +490,7 @@ x-kafka-env:
   #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_TRUSTSTORE_TYPE: 'PKCS12'
   #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_TRUSTSTORE_LOCATION: '/etc/kafka/secrets/truststore.p12'
   #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_TRUSTSTORE_PASSWORD: ${CERT_SECRET}
-  #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_TRUSTSTORE_CREDENTIALS: 'kafka.secret'
+  #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_TRUSTSTORE_CREDENTIALS: '/run/secrets/kafka_secret'
   #  KAFKA_LISTENER_NAME_EXTERNAL_SSL_PRINCIPAL_MAPPING_RULES: ${SSL_PRINCIPAL_MAPPING_RULES}
 
   # metrics reporter
@@ -517,7 +516,7 @@ services:
       - "9092:9092"
       - "1234:1234"
     networks:
-      - my-network
+      - cluster-network
     healthcheck:
       test: [ "CMD", "nc", "-z", "kafka0", "9092" ]
       interval: 30s
@@ -538,17 +537,23 @@ services:
 #      - ../kafka/metrics/exporter.yml:/usr/bin/jmx/exporter.yml
       - ../secrets/certs/kafka0:/etc/kafka/secrets/certs
       - ../secrets/keypair/kafka:/etc/kafka/secrets/oauth
-      - ../secrets/kafka0/kafka.secret:/etc/kafka/secrets/kafka.secret
+    secrets:
+      - kafka_secret
     environment:
       <<: *ldnhan-kafka-env
       KAFKA_NODE_ID: '0'
       KAFKA_LISTENERS: CONTROLLER://kafka0:29092,INTERNAL://kafka0:19092,EXTERNAL://kafka0:9092
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka0:19092,EXTERNAL://kafka0:9092
+    env_file: ../.env
 
 volumes:
   kafka0-data:
     driver: local
 
+secrets:
+  kafka_secret:
+    file: ../secrets/kafka/kafka.secret
+
 networks:
-  my-network:
+  cluster-network:
     driver: bridge

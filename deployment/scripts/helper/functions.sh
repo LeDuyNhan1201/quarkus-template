@@ -10,42 +10,59 @@ create_client_files() {
 }
 
 create_data_folders() {
-    mkdir -p data
-    sudo chown -R 1000:1000 data
-    sudo chmod -R 755 data
+    echo "Creating data folders"
+
+    mkdir -p $DATA_DIR
+    sudo chown -R 1000:1000 $DATA_DIR
+    sudo chmod -R 755 $DATA_DIR
 
     # Create and delegate root access for kafka brokers logs folder
-    mkdir -p data/kafka0-logs
-    sudo chown -R 1000:1000 data/kafka0-logs
-    sudo chmod -R 755 data/kafka0-logs
+    mkdir -p $DATA_DIR/kafka0-logs
+    sudo chown -R 1000:1000 $DATA_DIR/kafka0-logs
+    sudo chmod -R 755 $DATA_DIR/kafka0-logs
 
     # Create and delegate root access for kafka brokers config folder
-    mkdir -p data/kafka0-config
-    sudo chown -R 1000:1000 data/kafka0-config
-    sudo chmod -R 755 data/kafka0-config
+    mkdir -p $DATA_DIR/kafka0-config
+    sudo chown -R 1000:1000 $DATA_DIR/kafka0-config
+    sudo chmod -R 755 $DATA_DIR/kafka0-config
 
     # Create and delegate root access for kafka brokers kraft folder
-    mkdir -p data/kafka0-data
-    sudo chmod -R 755 data/kafka0-data
-    sudo chown -R 1000:1000 data/kafka0-data
+    mkdir -p $DATA_DIR/kafka0-data
+    sudo chmod -R 755 $DATA_DIR/kafka0-data
+    sudo chown -R 1000:1000 $DATA_DIR/kafka0-data
+
+    # Create and delegate root access for pgdata folder
+    mkdir -p $DATA_DIR/pgdata
+    sudo chmod -R 755 $DATA_DIR/pgdata
+    sudo chown -R 1000:1000 $DATA_DIR/pgdata
+}
+
+create_secrets() {
+    echo "Creating secrets"
+
+    # Clean old content before overwrite
+    mkdir -p $SECRETS_DIR/kafka
+    mkdir -p $SECRETS_DIR/postgres
+    : > $SECRETS_DIR/kafka/kafka.secret
+    : > $SECRETS_DIR/postgres/postgres.password
+
+    echo "$CERT_SECRET" >> $SECRETS_DIR/kafka/kafka.secret
+    echo "$POSTGRES_TEXT_PASSWORD" >> $SECRETS_DIR/postgres/postgres.password
 }
 
 create_env_file() {
     echo "Creating env files"
-    rm -rf secrets/*
 
     # Clean old content before overwrite
     : > .env
-    mkdir -p secrets/kafka0
-    mkdir -p secrets/postgres
-    : > secrets/kafka0/kafka.secret
-    : > secrets/postgres/postgres.password
-
-    echo "$CERT_SECRET" >> secrets/kafka0/kafka.secret
-    echo "$POSTGRES_TEXT_PASSWORD" >> secrets/postgres/postgres.password
 
     {
       echo LOCAL_IP="$LOCAL_IP"
+      echo GATEWAY_PORT="$GATEWAY_PORT"
+      echo KEYCLOAK_HOSTNAME="$KEYCLOAK_HOSTNAME"
+      echo POSTGRES_HOSTNAME="$POSTGRES_HOSTNAME"
+      echo KAFKA_UI_HOSTNAME="$KAFKA_UI_HOSTNAME"
+      echo ENVOY_HOSTNAME="$ENVOY_HOSTNAME"
 
       echo NAMESPACE="$NAMESPACE"
       echo REPOSITORY_NAME="$REPOSITORY_NAME"
@@ -54,6 +71,7 @@ create_env_file() {
       echo POSTGRES_TAG="$POSTGRES_TAG"
       echo CONFLUENT_TAG="$CONFLUENT_TAG"
       echo APACHE_KAFKA_TAG="$APACHE_KAFKA_TAG"
+      echo ENVOY_TAG="$ENVOY_TAG"
 
       echo CERT_SECRET="$CERT_SECRET"
 

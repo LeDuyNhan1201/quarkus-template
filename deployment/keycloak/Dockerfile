@@ -7,6 +7,8 @@ ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 
+ENV KC_FEATURES=http-optimized-serializers
+
 WORKDIR /opt/keycloak
 
 # Copy certificates
@@ -38,7 +40,9 @@ ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
 
 # TLS
-#ENV KC_HOSTNAME_STRICT=true
+#ENV KC_TLS_HOSTNAME_VERIFIER=DEFAULT
+ENV KC_TLS_HOSTNAME_VERIFIER=ANY
+#ENV KC_TRUSTSTORE_PATHS=/opt/keycloak/conf/truststores/truststore.pem
 #ENV KC_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt
 #ENV KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key
 

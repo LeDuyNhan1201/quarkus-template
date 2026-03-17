@@ -6,6 +6,7 @@ set -euo pipefail
 # -------------------------------
 
 MODE="${1:-dev}"
+export MODE
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
@@ -33,12 +34,17 @@ source "${KEYPAIR_SCRIPT}"
 
 create_client_files
 create_env_file
+create_secrets
 create_data_folders
 
 generate_root_ca
-generate_cert_with_keystore_and_truststore "postgres" "postgres" "ldnhan.${MODE}.postgres"
-generate_cert_with_keystore_and_truststore "keycloak" "keycloak" "ldnhan.${MODE}.keycloak"
-generate_cert_with_keystore_and_truststore "kafka0" "kafka0" "ldnhan.${MODE}.kafka0"
+generate_cert_with_keystore_and_truststore "envoy" "envoy" "${ENVOY_HOSTNAME}"
+generate_cert_with_keystore_and_truststore "postgres" "postgres" "${POSTGRES_HOSTNAME}"
+generate_cert_with_keystore_and_truststore "keycloak" "keycloak" "${KEYCLOAK_HOSTNAME}"
+generate_cert_with_keystore_and_truststore "kafka-ui" "kafka-ui" "${KAFKA_UI_HOSTNAME}"
+generate_cert_with_keystore_and_truststore "kafka0" "kafka0" "kafka0.${NAMESPACE}.${MODE}"
+generate_cert_with_keystore_and_truststore "kafka1" "kafka1" "kafka1.${NAMESPACE}.${MODE}"
+generate_cert_with_keystore_and_truststore "kafka2" "kafka2" "kafka2.${NAMESPACE}.${MODE}"
 
 generate_jwt_keypair kafka kafka true
 
