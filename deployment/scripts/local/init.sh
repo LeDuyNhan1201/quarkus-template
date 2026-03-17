@@ -58,12 +58,12 @@ docker build \
   --build-arg POSTGRES_TAG="${POSTGRES_TAG}" \
   -f postgres/Dockerfile \
   -t "${IMAGE_PREFIX}/postgres:${POSTGRES_TAG}" \
-  .
+  . || true
 
 docker build \
   --build-arg KEYCLOAK_TAG="${KEYCLOAK_TAG}" \
   -f keycloak/Dockerfile \
   -t "${IMAGE_PREFIX}/keycloak:${KEYCLOAK_TAG}" \
-  .
+  . || true
 
 echo "Initialize completed successfully."

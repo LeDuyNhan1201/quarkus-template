@@ -6,7 +6,7 @@ FROM quay.io/keycloak/keycloak:${KEYCLOAK_TAG} AS builder
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_DB=postgres
-
+#ENV KC_HTTP_RELATIVE_PATH=/kc
 ENV KC_FEATURES=http-optimized-serializers
 
 WORKDIR /opt/keycloak

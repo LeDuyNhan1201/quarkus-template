@@ -50,28 +50,31 @@ static_resources:
                       domains:
                         - "localhost:8889"
                         - "192.168.155.40:8889"
-                        - "*.leduynhan1201.dev"
+                        - "*.leduynhan1201.dev:8889"
 
                       routes:
                         - match:
-                            prefix: "/kc"
+                            prefix: "/"
                           route:
                             cluster: keycloak_cluster
-                            prefix_rewrite: "/"
+#                            prefix_rewrite: "/"
                             hash_policy:
 #                              - connection_properties:
 #                                  source_ip: true
                               - cookie:
                                   name: AUTH_SESSION_ID
                                   ttl: 0s
+                              - cookie:
+                                  name: KEYCLOAK_SESSION
+                                  ttl: 0s
 
-#                          request_headers_to_add:
-#                            - header:
-#                                key: x-forwarded-proto
-#                                value: https
-#                            - header:
-#                                key: x-forwarded-port
-#                                value: "443"
+                          request_headers_to_add:
+                            - header:
+                                key: x-forwarded-proto
+                                value: https
+                            - header:
+                                key: x-forwarded-port
+                                value: "8889"
 
                 http_filters:
                   - name: envoy.filters.http.router

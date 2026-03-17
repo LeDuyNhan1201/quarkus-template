@@ -44,6 +44,10 @@ renew-certs:
 	@echo "Generating $(SERVER_NAME) certificates..."
 	@./scripts/$(RUN_ENV)/renew_certs.sh $(MODE) $(SERVER_NAME)
 
+rebuild-images:
+	@echo "Rebuild local images..."
+	@./scripts/$(RUN_ENV)/rebuild_images.sh $(MODE)
+
 .PHONY: init
 init:
 	@echo "Initializing environment..."

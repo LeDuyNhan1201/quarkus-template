@@ -9,7 +9,7 @@ x-keycloak-env: &ldnhan-keycloak-env
   KC_CACHE_STACK: "jdbc-ping"
   KC_SPI_STICKY_SESSION_ENCODER__INFINISPAN__SHOULD_ATTACH_ROUTE: true
   # --- HTTP & Host Configuratiown ---
-  KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+  KC_HOSTNAME: "https://${KEYCLOAK_HOSTNAME}:${GATEWAY_PORT}"
   KC_HOSTNAME_STRICT: "false"
   KC_HTTP_ENABLED: "true"
   KC_PROXY_HEADERS: "xforwarded"
