@@ -23,7 +23,7 @@ export-realm:
 		exit 1; \
 	fi
 	@echo "Exporting realm $(REALM)..."
-	@docker exec keycloak /opt/keycloak/bin/kc.sh export \
+	@docker exec keycloak0 /opt/keycloak/bin/kc.sh export \
 		--realm $(REALM) \
 		--dir /opt/keycloak/data/export \
 		--users realm_file
