@@ -2,9 +2,9 @@ export NAMESPACE="leduynhan1201"
 export REPOSITORY_NAME="kafka-sample"
 
 export KEYCLOAK_TAG=nightly # https://quay.io/repository/keycloak/keycloak?tab=tags
-export POSTGRES_TAG=16.13-alpine3.23 # https://hub.docker.com/_/postgres/tags
+export POSTGRES_TAG=17.9-alpine3.22 # https://hub.docker.com/_/postgres/tags
 export CONFLUENT_TAG=7.7.7 # https://hub.docker.com/r/confluentinc/cp-kafka/tags
-export APACHE_KAFKA_TAG=4.0.2-rc3 # https://hub.docker.com/r/apache/kafka-native/tags
+export APACHE_KAFKA_TAG=4.2.1-rc1 # https://hub.docker.com/r/apache/kafka-native/tags
 export ENVOY_TAG=tools-dev # https://hub.docker.com/r/envoyproxy/envoy/tags
 
 LOCAL_IP=$(hostname -I | awk '{print $1}')
@@ -49,17 +49,17 @@ export SSL_CIPHER_SUITES=TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS
 
 # IDP configurations
 export CLUSTER_ID=${NAMESPACE}-${REPOSITORY_NAME}-cluster
-export KAFKA_IDP_URL=http://${KEYCLOAK_HOSTNAME}:${GATEWAY_PORT}/
+export KAFKA_IDP_URL=https://${KEYCLOAK_HOSTNAME}:${GATEWAY_PORT}/
 export KAFKA_IDP_REALM=kafka
 export KAFKA_IDP_TOKEN_ENDPOINT=${KAFKA_IDP_URL}realms/${KAFKA_IDP_REALM}/protocol/openid-connect/token
 export KAFKA_IDP_JWKS_ENDPOINT=${KAFKA_IDP_URL}realms/${KAFKA_IDP_REALM}/protocol/openid-connect/certs
 export KAFKA_IDP_EXPECTED_ISSUER=${KAFKA_IDP_URL}realms/${KAFKA_IDP_REALM}
 export KAFKA_IDP_AUTH_ENDPOINT=${KAFKA_IDP_URL}realms/${KAFKA_IDP_REALM}/protocol/openid-connect/auth
 export KAFKA_IDP_AUTH_DEVICE_ENDPOINT=${KAFKA_IDP_URL}realms/${KAFKA_IDP_REALM}/protocol/openid-connect/auth/device
-export KAFKA_SUB_CLAIM_NAME=sub
-export KAFKA_SCOPE_CLAIM_NAME=scope
-export KAFKA_GROUP_CLAIM_NAME=groups
-export KAFKA_EXPECTED_AUDIENCE=account
+export KAFKA_IDP_SUB_CLAIM_NAME=sub
+export KAFKA_IDP_SCOPE_CLAIM_NAME=scope
+export KAFKA_IDP_GROUP_CLAIM_NAME=groups
+export KAFKA_IDP_EXPECTED_AUDIENCE=account
 export KAFKA_AUTHORIZER_CLASS=io.strimzi.kafka.oauth.server.authorizer.KeycloakAuthorizer
 export KAFKA_PRINCIPAL_BUILDER_CLASS=io.strimzi.kafka.oauth.server.OAuthKafkaPrincipalBuilder
 export SASL_LOGIN_CALLBACK_HANDLER_CLASS=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
