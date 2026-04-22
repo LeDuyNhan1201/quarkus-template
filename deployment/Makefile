@@ -17,16 +17,30 @@ remove-images:
 	docker rmi quarkus/concert-builder
 	docker rmi quarkus/booking-builder
 
-export-realm:
+# ===== Default values =====
+REALM ?=
+CONTAINER ?= keycloak0
+EXPORT_DIR ?= /opt/keycloak/data/export
+LOG_LEVEL ?= info
+
+# optional
+USERS_PER_FILE ?=
+
+# ===== Validate =====
+check-realm:
 	@if [ -z "$(REALM)" ]; then \
 		echo "REALM is required. Use: make export-realm REALM=myrealm"; \
 		exit 1; \
 	fi
+
+# ===== Export realm =====
+export-realm: check-realm
 	@echo "Exporting realm $(REALM)..."
-	@docker exec keycloak0 /opt/keycloak/bin/kc.sh export \
+	@docker exec $(CONTAINER) /opt/keycloak/bin/kc.sh export \
 		--realm $(REALM) \
-		--dir /opt/keycloak/data/export \
-		--users realm_file
+		--dir $(EXPORT_DIR) \
+		$(if $(USERS_PER_FILE),--users different_files --users-per-file $(USERS_PER_FILE),--users realm_file) \
+		--log-level $(LOG_LEVEL)
 	@echo "Done."
 
 .PHONY: prepare
